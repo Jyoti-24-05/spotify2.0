@@ -1,7 +1,10 @@
 import { Router } from "express";
+import { getAllSongs, getFeaturedSongs, getMadeForYouSongs, getTrendingSongs } from "../controller/song.controller";
 
 const router=Router();
-router.get('/',(req,res)=>{
-  res.send('song route with GET');
-});
-export default router
+router.get('/', protectRoute, requireAdmin, getAllSongs);
+router.get('/featured', getFeaturedSongs);
+router.get('/made-for-you', getMadeForYouSongs);
+router.get('/trending', getTrendingSongs);
+
+export default router;
