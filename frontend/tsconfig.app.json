@@ -8,6 +8,11 @@
     "types": ["vite/client"],
     "skipLibCheck": true,
 
+    "baseUrl": ".",
+		"paths": {
+			"@/*": ["./src/*"]
+		},
+
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
@@ -25,10 +30,6 @@
     "noUncheckedSideEffectImports": true,
 
     /* ⚡ Add alias here explicitly for ShadCN */
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"]
-    }
   },
   "include": ["src"]
 }
