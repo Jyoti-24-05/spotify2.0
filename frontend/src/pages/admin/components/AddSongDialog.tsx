@@ -104,7 +104,7 @@ const AddSongDialog = () => {
 				</DialogHeader>
 
 				<div className='space-y-4 py-4'>
-					<input
+					<Input
 						type='file'
 						accept='audio/*'
 						ref={audioInputRef}
@@ -112,7 +112,7 @@ const AddSongDialog = () => {
 						onChange={(e) => setFiles((prev) => ({ ...prev, audio: e.target.files![0] }))}
 					/>
 
-					<input
+					<Input
 						type='file'
 						ref={imageInputRef}
 						className='hidden'
