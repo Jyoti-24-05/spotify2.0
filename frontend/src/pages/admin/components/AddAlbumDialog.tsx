@@ -83,7 +83,7 @@ const AddAlbumDialog = () => {
 					<DialogDescription>Add a new album to your collection</DialogDescription>
 				</DialogHeader>
 				<div className='space-y-4 py-4'>
-					<input
+					<Input
 						type='file'
 						ref={fileInputRef}
 						onChange={handleImageSelect}

@@ -47,7 +47,7 @@ app.use(
 	})
 );
 
-cron jobs
+//cron jobs
 const tempDir = path.join(process.cwd(), "tmp");
 cron.schedule("0 * * * *", () => {
 	if (fs.existsSync(tempDir)) {
