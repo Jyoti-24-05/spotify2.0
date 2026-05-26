@@ -1,5 +1,5 @@
 import { axiosInstance } from "@/lib/axios";
-import { Message, User } from "@/types";
+import type { Message, User } from "@/types";
 import { create } from "zustand";
 import { io } from "socket.io-client";
 
@@ -12,6 +12,7 @@ interface ChatStore {
 	onlineUsers: Set<string>;
 	userActivities: Map<string, string>;
 	messages: Message[];
+	readMessageIds: Set<string>;
 	selectedUser: User | null;
 
 	fetchUsers: () => Promise<void>;
@@ -20,6 +21,7 @@ interface ChatStore {
 	sendMessage: (receiverId: string, senderId: string, content: string) => void;
 	fetchMessages: (userId: string) => Promise<void>;
 	setSelectedUser: (user: User | null) => void;
+	markMessagesReadForUser: (userId: string) => void;
 }
 
 const baseURL = import.meta.env.MODE === "development" ? "http://localhost:5000" : "/";
@@ -38,9 +40,23 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 	onlineUsers: new Set(),
 	userActivities: new Map(),
 	messages: [],
+	readMessageIds: new Set(JSON.parse(localStorage.getItem("chat.readMessageIds") || "[]")),
 	selectedUser: null,
 
 	setSelectedUser: (user) => set({ selectedUser: user }),
+
+	markMessagesReadForUser: (userId: string) => {
+		const msgs = get().messages;
+		const readIds = new Set(get().readMessageIds);
+		for (const m of msgs) {
+			if (m.receiverId === userId) readIds.add(m._id);
+		}
+		const arr = Array.from(readIds);
+		try {
+			localStorage.setItem("chat.readMessageIds", JSON.stringify(arr));
+		} catch (e) {}
+		set({ readMessageIds: readIds });
+	},
 
 	fetchUsers: async () => {
 		set({ isLoading: true, error: null });
@@ -83,16 +99,20 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 				});
 			});
 
+			const pushUniqueMessage = (message: Message) => {
+				set((state) => {
+					const existingIds = new Set(state.messages.map((m) => m._id));
+					if (existingIds.has(message._id)) return {};
+					return { messages: [...state.messages, message] };
+				});
+			};
+
 			socket.on("receive_message", (message: Message) => {
-				set((state) => ({
-					messages: [...state.messages, message],
-				}));
+				pushUniqueMessage(message);
 			});
 
 			socket.on("message_sent", (message: Message) => {
-				set((state) => ({
-					messages: [...state.messages, message],
-				}));
+				pushUniqueMessage(message);
 			});
 
 			socket.on("activity_updated", ({ userId, activity }) => {
@@ -125,7 +145,10 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 		set({ isLoading: true, error: null });
 		try {
 			const response = await axiosInstance.get(`/users/messages/${userId}`);
-			set({ messages: response.data });
+			// dedupe server response and existing messages
+			const existing = get().messages.reduce((map, m) => (map.set(m._id, m), map), new Map<string, Message>());
+			for (const m of response.data as Message[]) existing.set(m._id, m);
+			set({ messages: Array.from(existing.values()) });
 		} catch (error: any) {
 			set({ error: error.response.data.message });
 		} finally {

@@ -109,6 +109,43 @@ export const deleteAlbum = async (req, res, next) => {
 	}
 };
 
+export const createYoutubeSong = async (req, res, next) => {
+	try {
+		const { 
+			title, artist, imageUrl, youtubeVideoId, 
+			duration, youtubeDescription, youtubePublishedAt, youtubeViewCount 
+		} = req.body;
+
+		if (!youtubeVideoId) {
+			return res.status(400).json({ message: "YouTube Video ID is required" });
+		}
+
+		// Check if it already exists to avoid duplicates
+		const existingSong = await Song.findOne({ youtubeVideoId });
+		if (existingSong) {
+			return res.status(200).json(existingSong);
+		}
+
+		const song = new Song({
+			title,
+			artist,
+			imageUrl,
+			audioUrl: "", // YouTube songs don't use local audio files
+			duration,
+			youtubeVideoId,
+			youtubeDescription,
+			youtubePublishedAt,
+			youtubeViewCount,
+		});
+
+		await song.save();
+		res.status(201).json(song);
+	} catch (error) {
+		console.log("Error in createYoutubeSong", error);
+		next(error);
+	}
+};
+
 export const checkAdmin = async (req, res, next) => {
 	res.status(200).json({ admin: true });
 };

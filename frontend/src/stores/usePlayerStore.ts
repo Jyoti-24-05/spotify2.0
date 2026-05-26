@@ -61,7 +61,7 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
 			});
 		}
 
-		const songIndex = get().queue.findIndex((s) => s._id === song._id);
+		const songIndex = get().queue.findIndex((s) => s._id === song._id || (s.youtubeVideoId && s.youtubeVideoId === song.youtubeVideoId));
 		set({
 			currentSong: song,
 			isPlaying: true,

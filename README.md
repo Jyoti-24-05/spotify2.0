@@ -1,8 +1,8 @@
-# Spotify 2.0 Clone
+# Spotify 2.0 
 
 A full-stack Spotify-like music streaming application built using modern web technologies.
 
-## 🚀 Tech Stack
+##  Tech Stack
 
 ### Frontend
 - React
@@ -15,5 +15,5 @@ A full-stack Spotify-like music streaming application built using modern web tec
 - MongoDB
 - Mongoose
 
-## 📁 Project Structure
+
 

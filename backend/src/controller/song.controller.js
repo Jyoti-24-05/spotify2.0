@@ -80,3 +80,40 @@ export const getTrendingSongs = async (req, res, next) => {
 		next(error);
 	}
 };
+
+export const addYoutubeSong = async (req, res, next) => {
+  try {
+    const { 
+      title, 
+      artist, 
+      imageUrl, 
+      youtubeVideoId, 
+      duration, 
+      youtubeDescription, 
+      youtubePublishedAt, 
+      youtubeViewCount 
+    } = req.body;
+
+    // Check if it's already in the database
+    let song = await Song.findOne({ youtubeVideoId });
+    
+    if (!song) {
+      song = new Song({
+        title,
+        artist,
+        imageUrl,
+        audioUrl: "", // Empty because we play via YouTube ID
+        youtubeVideoId,
+        duration,
+        youtubeDescription,
+        youtubePublishedAt,
+        youtubeViewCount,
+      });
+			await song.save();
+    }
+
+    res.status(201).json(song);
+  } catch (error) {
+    next(error);
+  }
+};

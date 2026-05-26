@@ -7,6 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import MessageInput from "./components/MessageInput";
 import Topbar from "@/components/Tobbar";
+import type { MessageCircleReply } from "lucide-react";
 
 const formatTime = (date: string) => {
 	return new Date(date).toLocaleTimeString("en-US", {
@@ -18,11 +19,15 @@ const formatTime = (date: string) => {
 
 const ChatPage = () => {
 	const { user } = useUser();
-	const { messages, selectedUser, fetchUsers, fetchMessages } = useChatStore();
+	const { messages, selectedUser, fetchUsers, fetchMessages, markMessagesReadForUser } = useChatStore();
 
 	useEffect(() => {
 		if (user) fetchUsers();
 	}, [fetchUsers, user]);
+
+	useEffect(() => {
+		if (user) markMessagesReadForUser(user.id);
+	}, [user, markMessagesReadForUser]);
 
 	useEffect(() => {
 		if (selectedUser) fetchMessages(selectedUser.clerkId);

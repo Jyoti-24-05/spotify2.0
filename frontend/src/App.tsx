@@ -10,7 +10,27 @@ import AdminPage from "./pages/admin/AdminPage";
 import { Toaster } from "react-hot-toast";
 import NotFoundPage from "./pages/404/NotFoundPage";
 
+import{useAuth} from "@clerk/clerk-react";
+import { useEffect } from "react";
+import { axiosInstance } from "./lib/axios";
+
 function App() {
+	const { getToken, isSignedIn } = useAuth();
+
+  useEffect(() => {
+    const updateToken = async () => {
+      if (isSignedIn) {
+        const token = await getToken();
+        // Set the header for all future axios requests
+        axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      } else {
+        delete axiosInstance.defaults.headers.common["Authorization"];
+      }
+    };
+
+    updateToken();
+  }, [isSignedIn, getToken]);
+
 	return (
 		<>
 			<Routes>

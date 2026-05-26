@@ -8,6 +8,11 @@ export interface Song {
 	duration: number;
 	createdAt: string;
 	updatedAt: string;
+	
+	youtubeVideoId?: string;
+  youtubeDescription?: string;
+  youtubePublishedAt?: string;
+  youtubeViewCount?: number;
 }
 
 export interface Album {

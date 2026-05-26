@@ -17,9 +17,14 @@ export const PlaybackControls = () => {
 	const [currentTime, setCurrentTime] = useState(0);
 	const [duration, setDuration] = useState(0);
 	const audioRef = useRef<HTMLAudioElement | null>(null);
+	const youtubePlayerRef = useRef<any>(null);
+	const updateIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
 	useEffect(() => {
 		audioRef.current = document.querySelector("audio");
+		youtubePlayerRef.current = (window as any).YT?.Player?.constructor?.toString().includes("YT") 
+			? document.getElementById("youtube-player")?.parentElement 
+			: null;
 
 		const audio = audioRef.current;
 		if (!audio) return;
@@ -43,9 +48,63 @@ export const PlaybackControls = () => {
 		};
 	}, [currentSong]);
 
+	// Update playback progress for YouTube videos
+	useEffect(() => {
+		if (currentSong?.youtubeVideoId && (window as any).YT?.PlayerState) {
+			const updateYoutubeTime = () => {
+				try {
+					const ytPlayer = (window as any).document.querySelector("iframe[src*='youtube']")?.parentElement;
+					if (ytPlayer && typeof ytPlayer.getCurrentTime === "function") {
+						setCurrentTime(ytPlayer.getCurrentTime());
+						setDuration(ytPlayer.getDuration());
+					}
+				} catch (e) {
+					// Player might not be ready yet
+				}
+			};
+
+			if (updateIntervalRef.current) clearInterval(updateIntervalRef.current);
+			updateIntervalRef.current = setInterval(updateYoutubeTime, 1000);
+
+			return () => {
+				if (updateIntervalRef.current) clearInterval(updateIntervalRef.current);
+			};
+		}
+	}, [currentSong?.youtubeVideoId]);
+
 	const handleSeek = (value: number[]) => {
-		if (audioRef.current) {
+		if (currentSong?.youtubeVideoId) {
+			// YouTube video seek
+			try {
+				const ytIframe = document.querySelector("iframe[src*='youtube']") as HTMLIFrameElement;
+				if (ytIframe && ytIframe.parentElement && typeof ytIframe.parentElement.seekTo === "function") {
+					(ytIframe.parentElement as any).seekTo(value[0], true);
+				}
+			} catch (e) {
+				console.log("YouTube seek not available yet");
+			}
+		} else if (audioRef.current) {
+			// Local audio seek
 			audioRef.current.currentTime = value[0];
+		}
+	};
+
+	const handleVolumeChange = (value: number[]) => {
+		setVolume(value[0]);
+		
+		if (currentSong?.youtubeVideoId) {
+			// YouTube volume
+			try {
+				const ytIframe = document.querySelector("iframe[src*='youtube']") as HTMLIFrameElement;
+				if (ytIframe && ytIframe.parentElement && typeof ytIframe.parentElement.setVolume === "function") {
+					(ytIframe.parentElement as any).setVolume(value[0]);
+				}
+			} catch (e) {
+				console.log("YouTube volume control not available");
+			}
+		} else if (audioRef.current) {
+			// Local audio volume
+			audioRef.current.volume = value[0] / 100;
 		}
 	};
 
@@ -154,12 +213,7 @@ export const PlaybackControls = () => {
 							max={100}
 							step={1}
 							className='w-24 hover:cursor-grab active:cursor-grabbing'
-							onValueChange={(value) => {
-								setVolume(value[0]);
-								if (audioRef.current) {
-									audioRef.current.volume = value[0] / 100;
-								}
-							}}
+							onValueChange={handleVolumeChange}
 						/>
 					</div>
 				</div>

@@ -10,6 +10,7 @@
 
     "composite": true,
     "baseUrl": ".",
+    "rootDir": ".",
     "paths": {
       "@/*": ["src/*"]
     },
@@ -31,7 +32,6 @@
 
     "declaration": true,
     "outDir": "./dist",
-    "rootDir": ".",
   },
   "include": ["vite.config.ts", "vite.env.d.ts"],
   "exclude": ["node_modules"]

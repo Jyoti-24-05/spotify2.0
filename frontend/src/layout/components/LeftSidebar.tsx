@@ -3,13 +3,19 @@ import { buttonVariants } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { useMusicStore } from "@/stores/useMusicStore";
+import { useChatStore } from "@/stores/useChatStore";
+import { useAuth } from "@clerk/clerk-react";
 import { SignedIn } from "@clerk/clerk-react";
 import { HomeIcon, Library, MessageCircle } from "lucide-react";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 const LeftSidebar = () => {
-	const { albums, fetchAlbums, isLoading } = useMusicStore();
+		const { albums, fetchAlbums, isLoading } = useMusicStore();
+		const { messages, readMessageIds } = useChatStore();
+		const { userId } = useAuth();
+
+		const unreadCount = messages.filter((m) => m.receiverId === userId && !readMessageIds.has(m._id)).length;
 
 	useEffect(() => {
 		fetchAlbums();
@@ -38,16 +44,21 @@ const LeftSidebar = () => {
 
 					<SignedIn>
 						<Link
-							to={"/chat"}
+							to={'/chat'}
 							className={cn(
 								buttonVariants({
-									variant: "ghost",
-									className: "w-full justify-start text-white hover:bg-zinc-800",
+									variant: 'ghost',
+									className: 'w-full justify-start text-white hover:bg-zinc-800',
 								})
 							)}
 						>
 							<MessageCircle className='mr-2 size-5' />
 							<span className='hidden md:inline'>Messages</span>
+							{unreadCount > 0 && (
+								<span className='ml-2 inline-flex items-center justify-center rounded-full bg-rose-500 px-2 py-0.5 text-xs font-semibold text-white'>
+									{unreadCount}
+								</span>
+							)}
 						</Link>
 					</SignedIn>
 				</div>
@@ -93,3 +104,5 @@ const LeftSidebar = () => {
 	);
 };
 export default LeftSidebar;
+
+
