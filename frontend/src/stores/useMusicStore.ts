@@ -14,6 +14,15 @@ interface MusicStore {
 	trendingSongs: Song[];
 	stats: Stats;
 
+	// Local DB search
+	searchResults: Song[];
+	searchQuery: string;
+	isSearching: boolean;
+
+	// External (iTunes) search
+	externalResults: Song[];
+	isExternalSearching: boolean;
+
 	fetchAlbums: () => Promise<void>;
 	fetchAlbumById: (id: string) => Promise<void>;
 	fetchFeaturedSongs: () => Promise<void>;
@@ -23,6 +32,11 @@ interface MusicStore {
 	fetchSongs: () => Promise<void>;
 	deleteSong: (id: string) => Promise<void>;
 	deleteAlbum: (id: string) => Promise<void>;
+	searchSongs: (query: string) => Promise<void>;
+	searchExternal: (query: string) => Promise<void>;
+	saveExternalSong: (song: Song) => Promise<Song | null>;
+	setSearchQuery: (query: string) => void;
+	clearSearch: () => void;
 }
 
 export const useMusicStore = create<MusicStore>((set) => ({
@@ -34,6 +48,11 @@ export const useMusicStore = create<MusicStore>((set) => ({
 	madeForYouSongs: [],
 	featuredSongs: [],
 	trendingSongs: [],
+	searchResults: [],
+	searchQuery: "",
+	isSearching: false,
+	externalResults: [],
+	isExternalSearching: false,
 	stats: {
 		totalSongs: 0,
 		totalAlbums: 0,
@@ -41,11 +60,72 @@ export const useMusicStore = create<MusicStore>((set) => ({
 		totalArtists: 0,
 	},
 
+	setSearchQuery: (query: string) => set({ searchQuery: query }),
+
+	clearSearch: () =>
+		set({
+			searchResults: [],
+			externalResults: [],
+			searchQuery: "",
+			isSearching: false,
+			isExternalSearching: false,
+		}),
+
+	searchSongs: async (query: string) => {
+		if (!query.trim()) {
+			set({ searchResults: [], isSearching: false });
+			return;
+		}
+		set({ isSearching: true });
+		try {
+			const response = await axiosInstance.get(`/songs/search?q=${encodeURIComponent(query)}`);
+			set({ searchResults: response.data });
+		} catch (error: any) {
+			console.error("Search error", error);
+		} finally {
+			set({ isSearching: false });
+		}
+	},
+
+	searchExternal: async (query: string) => {
+		if (!query.trim()) {
+			set({ externalResults: [], isExternalSearching: false });
+			return;
+		}
+		set({ isExternalSearching: true });
+		try {
+			const response = await axiosInstance.get(`/songs/external-search?q=${encodeURIComponent(query)}`);
+			set({ externalResults: response.data });
+		} catch (error: any) {
+			console.error("External search error", error);
+			set({ externalResults: [] });
+		} finally {
+			set({ isExternalSearching: false });
+		}
+	},
+
+	saveExternalSong: async (song: Song): Promise<Song | null> => {
+		try {
+			const response = await axiosInstance.post("/songs/save-external", {
+				itunesId: song.itunesId,
+				title: song.title,
+				artist: song.artist,
+				imageUrl: song.imageUrl,
+				audioUrl: song.audioUrl,
+				duration: song.duration,
+				albumName: song.albumName,
+			});
+			return response.data;
+		} catch (error: any) {
+			toast.error("Failed to save song");
+			return null;
+		}
+	},
+
 	deleteSong: async (id) => {
 		set({ isLoading: true, error: null });
 		try {
 			await axiosInstance.delete(`/admin/songs/${id}`);
-
 			set((state) => ({
 				songs: state.songs.filter((song) => song._id !== id),
 			}));
@@ -102,7 +182,6 @@ export const useMusicStore = create<MusicStore>((set) => ({
 
 	fetchAlbums: async () => {
 		set({ isLoading: true, error: null });
-
 		try {
 			const response = await axiosInstance.get("/albums");
 			set({ albums: response.data });

@@ -2,8 +2,6 @@ import { Song } from "../models/song.model.js";
 
 export const getAllSongs = async (req, res, next) => {
 	try {
-		// -1 = Descending => newest -> oldest
-		// 1 = Ascending => oldest -> newest
 		const songs = await Song.find().sort({ createdAt: -1 });
 		res.json(songs);
 	} catch (error) {
@@ -13,22 +11,10 @@ export const getAllSongs = async (req, res, next) => {
 
 export const getFeaturedSongs = async (req, res, next) => {
 	try {
-		// fetch 6 random songs using mongodb's aggregation pipeline
 		const songs = await Song.aggregate([
-			{
-				$sample: { size: 6 },
-			},
-			{
-				$project: {
-					_id: 1,
-					title: 1,
-					artist: 1,
-					imageUrl: 1,
-					audioUrl: 1,
-				},
-			},
+			{ $sample: { size: 6 } },
+			{ $project: { _id: 1, title: 1, artist: 1, imageUrl: 1, audioUrl: 1 } },
 		]);
-
 		res.json(songs);
 	} catch (error) {
 		next(error);
@@ -38,20 +24,9 @@ export const getFeaturedSongs = async (req, res, next) => {
 export const getMadeForYouSongs = async (req, res, next) => {
 	try {
 		const songs = await Song.aggregate([
-			{
-				$sample: { size: 4 },
-			},
-			{
-				$project: {
-					_id: 1,
-					title: 1,
-					artist: 1,
-					imageUrl: 1,
-					audioUrl: 1,
-				},
-			},
+			{ $sample: { size: 4 } },
+			{ $project: { _id: 1, title: 1, artist: 1, imageUrl: 1, audioUrl: 1 } },
 		]);
-
 		res.json(songs);
 	} catch (error) {
 		next(error);
@@ -61,19 +36,26 @@ export const getMadeForYouSongs = async (req, res, next) => {
 export const getTrendingSongs = async (req, res, next) => {
 	try {
 		const songs = await Song.aggregate([
-			{
-				$sample: { size: 4 },
-			},
-			{
-				$project: {
-					_id: 1,
-					title: 1,
-					artist: 1,
-					imageUrl: 1,
-					audioUrl: 1,
-				},
-			},
+			{ $sample: { size: 4 } },
+			{ $project: { _id: 1, title: 1, artist: 1, imageUrl: 1, audioUrl: 1 } },
 		]);
+		res.json(songs);
+	} catch (error) {
+		next(error);
+	}
+};
+
+export const searchSongs = async (req, res, next) => {
+	try {
+		const { q } = req.query;
+		if (!q || q.trim() === "") return res.json([]);
+
+		const songs = await Song.find({
+			$or: [
+				{ title: { $regex: q, $options: "i" } },
+				{ artist: { $regex: q, $options: "i" } },
+			],
+		}).limit(20);
 
 		res.json(songs);
 	} catch (error) {
@@ -81,39 +63,68 @@ export const getTrendingSongs = async (req, res, next) => {
 	}
 };
 
-export const addYoutubeSong = async (req, res, next) => {
-  try {
-    const { 
-      title, 
-      artist, 
-      imageUrl, 
-      youtubeVideoId, 
-      duration, 
-      youtubeDescription, 
-      youtubePublishedAt, 
-      youtubeViewCount 
-    } = req.body;
+// Search iTunes API (free, no key needed) — proxied here to avoid CORS
+export const externalSearchSongs = async (req, res, next) => {
+	try {
+		const { q } = req.query;
+		if (!q || q.trim() === "") return res.json([]);
 
-    // Check if it's already in the database
-    let song = await Song.findOne({ youtubeVideoId });
-    
-    if (!song) {
-      song = new Song({
-        title,
-        artist,
-        imageUrl,
-        audioUrl: "", // Empty because we play via YouTube ID
-        youtubeVideoId,
-        duration,
-        youtubeDescription,
-        youtubePublishedAt,
-        youtubeViewCount,
-      });
+		const url = `https://itunes.apple.com/search?term=${encodeURIComponent(q)}&media=music&entity=song&limit=25&country=IN`;
+		const response = await fetch(url);
+
+		if (!response.ok) {
+			return res.status(502).json({ message: "iTunes API unavailable" });
+		}
+
+		const data = await response.json();
+
+		const songs = (data.results || [])
+			.filter((track) => track.previewUrl) // only include tracks with playable preview
+			.map((track) => ({
+				_id: `itunes_${track.trackId}`,
+				itunesId: String(track.trackId),
+				title: track.trackName || "Unknown Title",
+				artist: track.artistName || "Unknown Artist",
+				imageUrl: (track.artworkUrl100 || "").replace("100x100bb", "300x300bb"),
+				audioUrl: track.previewUrl,
+				duration: Math.round((track.trackTimeMillis || 30000) / 1000),
+				albumId: null,
+				albumName: track.collectionName || "",
+				source: "itunes",
+			}));
+
+		res.json(songs);
+	} catch (error) {
+		next(error);
+	}
+};
+
+// Save an iTunes song to MongoDB so it can be added to playlists
+export const saveExternalSong = async (req, res, next) => {
+	try {
+		const { itunesId, title, artist, imageUrl, audioUrl, duration, albumName } = req.body;
+
+		if (!itunesId || !title || !artist || !audioUrl) {
+			return res.status(400).json({ message: "Missing required fields" });
+		}
+
+		// Return existing record if already saved
+		let song = await Song.findOne({ itunesId });
+		if (!song) {
+			song = new Song({
+				title,
+				artist,
+				imageUrl: imageUrl || "https://via.placeholder.com/300",
+				audioUrl,
+				duration: duration || 30,
+				albumName: albumName || "",
+				itunesId,
+			});
 			await song.save();
-    }
+		}
 
-    res.status(201).json(song);
-  } catch (error) {
-    next(error);
-  }
+		res.json(song);
+	} catch (error) {
+		next(error);
+	}
 };

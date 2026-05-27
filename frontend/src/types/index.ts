@@ -8,11 +8,10 @@ export interface Song {
 	duration: number;
 	createdAt: string;
 	updatedAt: string;
-	
-	youtubeVideoId?: string;
-  youtubeDescription?: string;
-  youtubePublishedAt?: string;
-  youtubeViewCount?: number;
+	// External (iTunes) song fields
+	itunesId?: string;
+	albumName?: string;
+	source?: "local" | "itunes";
 }
 
 export interface Album {
@@ -36,6 +35,16 @@ export interface Message {
 	senderId: string;
 	receiverId: string;
 	content: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface Playlist {
+	_id: string;
+	name: string;
+	userId: string;
+	songs: Song[];
+	imageUrl: string;
 	createdAt: string;
 	updatedAt: string;
 }

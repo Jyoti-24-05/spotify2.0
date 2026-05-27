@@ -1,5 +1,13 @@
 import { Router } from "express";
-import { getAllSongs, getFeaturedSongs, getMadeForYouSongs, getTrendingSongs, addYoutubeSong } from "../controller/song.controller.js";
+import {
+	getAllSongs,
+	getFeaturedSongs,
+	getMadeForYouSongs,
+	getTrendingSongs,
+	searchSongs,
+	externalSearchSongs,
+	saveExternalSong,
+} from "../controller/song.controller.js";
 import { protectRoute, requireAdmin } from "../middleware/auth.middleware.js";
 
 const router = Router();
@@ -8,6 +16,8 @@ router.get("/", protectRoute, requireAdmin, getAllSongs);
 router.get("/featured", getFeaturedSongs);
 router.get("/made-for-you", getMadeForYouSongs);
 router.get("/trending", getTrendingSongs);
-router.post("/youtube", protectRoute, addYoutubeSong);
+router.get("/search", protectRoute, searchSongs);
+router.get("/external-search", protectRoute, externalSearchSongs);
+router.post("/save-external", protectRoute, saveExternalSong);
 
 export default router;
