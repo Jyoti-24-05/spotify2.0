@@ -104,27 +104,36 @@ export const saveExternalSong = async (req, res, next) => {
 	try {
 		const { itunesId, title, artist, imageUrl, audioUrl, duration, albumName } = req.body;
 
-		if (!itunesId || !title || !artist || !audioUrl) {
-			return res.status(400).json({ message: "Missing required fields" });
-		}
+		// Validate required fields
+		if (!itunesId) return res.status(400).json({ message: "itunesId is required" });
+		if (!title)    return res.status(400).json({ message: "title is required" });
+		if (!artist)   return res.status(400).json({ message: "artist is required" });
+		if (!audioUrl) return res.status(400).json({ message: "audioUrl is required" });
 
-		// Return existing record if already saved
-		let song = await Song.findOne({ itunesId });
+		// Return existing record if already saved (idempotent)
+		let song = await Song.findOne({ itunesId: String(itunesId) });
+
 		if (!song) {
 			song = new Song({
-				title,
-				artist,
-				imageUrl: imageUrl || "https://via.placeholder.com/300",
-				audioUrl,
-				duration: duration || 30,
+				title:     String(title),
+				artist:    String(artist),
+				imageUrl:  imageUrl  || "https://via.placeholder.com/300",
+				audioUrl:  String(audioUrl),
+				duration:  Number(duration) || 30,
 				albumName: albumName || "",
-				itunesId,
+				itunesId:  String(itunesId),
 			});
 			await song.save();
 		}
 
 		res.json(song);
 	} catch (error) {
+		console.error("[save-external] error:", error.message, error.code);
+		// Duplicate key on itunesId — another request already saved it, just return it
+		if (error.code === 11000) {
+			const existing = await Song.findOne({ itunesId: String(req.body.itunesId) });
+			if (existing) return res.json(existing);
+		}
 		next(error);
 	}
 };

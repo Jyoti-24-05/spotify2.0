@@ -17,8 +17,7 @@ import authRoutes from "./routes/auth.route.js";
 import songRoutes from "./routes/song.route.js";
 import albumRoutes from "./routes/album.route.js";
 import statRoutes from "./routes/stat.route.js";
-import youtubeRoutes from "./routes/youtube.route.js";
-import { protectRoute } from "./middleware/auth.middleware.js";
+import playlistRoutes from "./routes/playlist.route.js";
 
 dotenv.config();
 
@@ -29,12 +28,20 @@ const PORT = process.env.PORT;
 const httpServer = createServer(app);
 initializeSocket(httpServer);
 
+const allowedOrigins = process.env.NODE_ENV === "production"
+	? [process.env.CLIENT_URL].filter(Boolean)
+	: ["http://localhost:3000", "http://localhost:5173"];
+
 app.use(
 	cors({
-		origin: process.env.NODE_ENV === "production" 
-      ? process.env.FRONTEND_URL 
-      : "http://localhost:3000",
-    credentials: true,
+		origin: (origin, callback) => {
+			// allow requests with no origin (mobile apps, curl, same-origin in prod)
+			if (!origin) return callback(null, true);
+			if (process.env.NODE_ENV === "production") return callback(null, true);
+			if (allowedOrigins.includes(origin)) return callback(null, true);
+			callback(new Error("Not allowed by CORS"));
+		},
+		credentials: true,
 	})
 );
 
@@ -73,7 +80,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/songs", songRoutes);
 app.use("/api/albums", albumRoutes);
 app.use("/api/stats", statRoutes);
-app.use("/api/youtube",youtubeRoutes);
+app.use("/api/playlists", playlistRoutes);
 
 if (process.env.NODE_ENV === "production") {
 	app.use(express.static(path.join(__dirname, "../frontend/dist")));
