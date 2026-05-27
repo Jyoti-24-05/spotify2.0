@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="//...your-logo-or-banner-image-here" alt="Spotify 2.0 Banner" width="100%" />
+<img src="./frontend/public/banner.png" alt="Spotify 2.0 Banner" width="100%" />
 
 # Spotify 2.0
 
