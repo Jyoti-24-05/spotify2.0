@@ -5,15 +5,10 @@
 # Spotify 2.0
 
 **A full-stack Spotify-inspired music streaming app** — with real-time chat, iTunes-powered search, personal playlists, and a live admin dashboard.
-
+<!-- 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit%20App-1DB954?style=for-the-badge&logo=render&logoColor=white)](//...your-render-url-here)
-[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Jyoti-24-05/spotify2.0)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Jyoti-24-05/spotify2.0) -->
 
-![React](https://img.shields.io/badge/React-18-61DAFB?style=flat&logo=react)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat&logo=typescript)
-![Node.js](https://img.shields.io/badge/Node.js-22-339933?style=flat&logo=node.js)
-![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=flat&logo=mongodb)
-![Socket.io](https://img.shields.io/badge/Socket.io-4-010101?style=flat&logo=socket.io)
 
 </div>
 
@@ -24,25 +19,25 @@
 <div align="center">
 
 ### Home Page
-<img src="//...screenshot-homepage.png" alt="Home Page" width="90%" />
+<img src="./frontend/public/home.png" alt="Home Page" width="90%" />
 
 ### Search — Library & iTunes Tabs
-<img src="//...screenshot-search.png" alt="Search" width="90%" />
+<img src="./frontend/public/itune.png" alt="Search" width="90%" />
 
 ### Playlist View
-<img src="//...screenshot-playlist.png" alt="Playlist" width="90%" />
+<img src="./frontend/public/playlist.png" alt="Playlist" width="90%" />
 
 ### Real-Time Chat
-<img src="//...screenshot-chat.png" alt="Chat" width="90%" />
+<img src="./frontend/public/chat.png" alt="Chat" width="90%" />
 
 ### Admin Dashboard
-<img src="//...screenshot-admin.png" alt="Admin Dashboard" width="90%" />
+<img src="./frontend/public/admin.png" alt="Admin Dashboard" width="90%" />
 
 </div>
 
 ---
 
-## 🎬 Demo
+<!-- ## 🎬 Demo
 
 <div align="center">
 
@@ -50,7 +45,7 @@
 
 [![Demo Video](//...demo-thumbnail.png)](//...demo-video-link-youtube-or-drive)
 
-</div>
+</div> -->
 
 ---
 
@@ -117,7 +112,7 @@
 
 ---
 
-## 🚀 Getting Started
+<!-- ## 🚀 Getting Started
 
 ### Prerequisites
 - Node.js v18+
@@ -272,7 +267,7 @@ Pull requests are welcome! For major changes, please open an issue first.
 
 ## 📄 License
 
-This project is licensed under the **ISC License**.
+This project is licensed under the **ISC License**. -->
 
 ---
 
