@@ -5,7 +5,7 @@ import SignInOAuthButtons from "./SignInOAuthButtons";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useMusicStore } from "@/stores/useMusicStore";
 import { usePlayerStore } from "@/stores/usePlayerStore";
-// import { usePlaylistStore } from "@/stores/usePlaylistStore";
+import { usePlaylistStore } from "@/stores/usePlaylistStore";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "./ui/button";
 import { useEffect, useRef, useState, useCallback } from "react";
@@ -32,19 +32,39 @@ function AddToPlaylistMenu({
     fetchPlaylists();
   }, [fetchPlaylists]);
 
-  const resolveMongoSong = async (): Promise<string | null> => {
-    // If it's an iTunes song, save it to MongoDB first to get a real _id
-    if (song.source === "itunes" && onSaveExternal) {
+  // Returns a real MongoDB ObjectId string.
+  // For iTunes songs: saves the song to MongoDB first, then returns its _id.
+  // For local songs: returns the existing _id directly.
+  const getMongoId = async (): Promise<string | null> => {
+    const isItunes = song.source === "itunes" || song._id.startsWith("itunes_");
+
+    if (isItunes) {
+      if (!onSaveExternal) {
+        toast.error("Cannot save this song — missing handler");
+        return null;
+      }
       setSaving(true);
-      const saved = await onSaveExternal();
-      setSaving(false);
-      return saved ? saved._id : null;
+      try {
+        const saved = await onSaveExternal();
+        if (!saved?._id) {
+          toast.error("Failed to save song to library");
+          return null;
+        }
+        return saved._id;
+      } catch (err) {
+        console.error("save-external failed:", err);
+        toast.error("Failed to save song to library");
+        return null;
+      } finally {
+        setSaving(false);
+      }
     }
+
     return song._id;
   };
 
   const handleAddToPlaylist = async (playlistId: string) => {
-    const songId = await resolveMongoSong();
+    const songId = await getMongoId();
     if (!songId) return;
     await addSongToPlaylist(playlistId, songId);
     onClose();
@@ -54,7 +74,7 @@ function AddToPlaylistMenu({
     if (!newName.trim()) return;
     const pl = await createPlaylist(newName.trim());
     if (pl) {
-      const songId = await resolveMongoSong();
+      const songId = await getMongoId();
       if (songId) await addSongToPlaylist(pl._id, songId);
       setNewName("");
       setCreating(false);
@@ -71,7 +91,7 @@ function AddToPlaylistMenu({
         {playlists.length === 0 && (
           <p className="px-3 py-2 text-xs text-zinc-500">No playlists yet</p>
         )}
-        {playlists.map((pl: any) => (
+        {playlists.map((pl) => (
           <button
             key={pl._id}
             onClick={() => handleAddToPlaylist(pl._id)}
@@ -293,7 +313,7 @@ export default function Topbar() {
               className="bg-transparent outline-none text-sm text-white placeholder-zinc-500 flex-1 min-w-0"
             />
             {searchQuery && (
-              <button type="button" onClick={handleClear} aria-label="Clear search" title="Clear search">
+              <button type="button" onClick={handleClear} title="Clear search">
                 <X className="size-4 text-zinc-400 hover:text-white" />
               </button>
             )}
