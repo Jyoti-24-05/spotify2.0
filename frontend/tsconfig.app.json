@@ -1,42 +1,24 @@
 {
-  "extends": "./tsconfig.json",
   "compilerOptions": {
     "composite": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-    "target": "ES2022",
+    "target": "ES2020",
     "useDefineForClassFields": true,
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
-    "types": ["vite/client"],
     "skipLibCheck": true,
-
-    "baseUrl": ".",
-		"paths": {
-			"@/*": ["src/*"]
-		},
-
-    /* Bundler mode */
     "moduleResolution": "bundler",
-    // "allowImportingTsExtensions": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
     "isolatedModules": true,
-    "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "jsx": "react-jsx",
-
-    /* Linting */
+    "types": ["vite/client"],
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "erasableSyntaxOnly": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true,
-
-    "declaration": true,
-    "outDir": "./dist",
-    "rootDir": "./src",
-
-    /* ⚡ Add alias here explicitly for ShadCN */
+    "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
-  "exclude": ["node_modules"]
+  "include": ["src"]
 }

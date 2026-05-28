@@ -1,18 +1,10 @@
 {
-	"files": [],
-	"references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }],
-	
-	"compilerOptions": {
-		"composite": true,
-    "declaration": true,
-		"strict":true,
-		"baseUrl": ".",
-		"module": "ESNext",
-		"moduleResolution": "bundler",
-		"paths": {
-			"@/*": ["src/*"]
-		},
-	},
-	"include": ["src/**/*"],
-	"exclude": ["node_modules"]
+  "compilerOptions": {
+    "strict": true
+  },
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ]
 }
