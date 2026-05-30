@@ -5,10 +5,8 @@
 # Spotify 2.0
 
 **A full-stack Spotify-inspired music streaming app** — with real-time chat, iTunes-powered search, personal playlists, and a live admin dashboard.
-<!-- 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit%20App-1DB954?style=for-the-badge&logo=render&logoColor=white)](//...your-render-url-here)
-[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Jyoti-24-05/spotify2.0) -->
 
+🌐 **Live Site → [musix-7xhg.onrender.com](https://musix-7xhg.onrender.com)**
 
 </div>
 
