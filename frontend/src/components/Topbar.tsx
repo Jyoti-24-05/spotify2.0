@@ -313,7 +313,7 @@ export default function Topbar() {
               className="bg-transparent outline-none text-sm text-white placeholder-zinc-500 flex-1 min-w-0"
             />
             {searchQuery && (
-              <button type="button" onClick={handleClear} title="Clear search">
+              <button type="button" onClick={handleClear} aria-label="Clear search">
                 <X className="size-4 text-zinc-400 hover:text-white" />
               </button>
             )}

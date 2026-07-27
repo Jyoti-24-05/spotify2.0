@@ -9,10 +9,10 @@
 🌐 **Live Site → [musix-7xhg.onrender.com](https://musix-7xhg.onrender.com)**
 
 </div>
-
+n
 ---
 
-## 📸 Screenshots
+## Screenshots
 
 <div align="center">
 
@@ -35,7 +35,7 @@
 
 ---
 
-<!-- ## 🎬 Demo
+<!-- ## Demo
 
 <div align="center">
 
@@ -47,31 +47,31 @@
 
 ---
 
-## ✨ Features
+## Features
 
-### 🎧 Music
+### Music
 - **iTunes-powered search** — search millions of songs via Apple's free iTunes API with instant 30-second previews
 - **Library search** — search your own uploaded song library
 - **Full audio player** — play, pause, skip, seek, volume control
 - **Auto-queue** — featured, trending, and "Made For You" sections feed into the player queue
 
-### 📋 Playlists
+### Playlists
 - Create, rename, and delete personal playlists
 - Add any song — local **or** iTunes — to a playlist with one click
 - iTunes songs are automatically saved to your library when added to a playlist
 - Remove individual songs from playlists
 
-### 💬 Real-Time Social
+### Real-Time Social
 - Live messaging between users via Socket.io
 - See what your friends are currently listening to in real time
 - Online/offline presence indicators
 
-### 🔐 Auth & Users
+### Auth & Users
 - OAuth sign-in via **Clerk** (Google, GitHub, etc.)
 - Protected routes — playlists, chat, and search require sign-in
 - Admin role with access to the dashboard
 
-### 🛠️ Admin Dashboard
+### Admin Dashboard
 - Upload songs (audio + cover art) to Cloudinary
 - Create and manage albums
 - Delete songs and albums
@@ -79,7 +79,7 @@
 
 ---
 
-## 🏗️ Tech Stack
+## Tech Stack
 
 ### Frontend
 | Technology | Purpose |
@@ -110,7 +110,7 @@
 
 ---
 
-<!-- ## 🚀 Getting Started
+<!-- ## Getting Started
 
 ### Prerequisites
 - Node.js v18+
@@ -176,7 +176,7 @@ npm run seed:albums   # seeds sample albums
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 spotify2.0/
@@ -205,7 +205,7 @@ spotify2.0/
 
 ---
 
-## 🌐 Deployment
+## Deployment
 
 This app is deployed as a **single service on Render** — the Express backend builds and serves the Vite frontend in production.
 
@@ -251,7 +251,7 @@ This app is deployed as a **single service on Render** — the Express backend b
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Pull requests are welcome! For major changes, please open an issue first.
 
@@ -263,7 +263,7 @@ Pull requests are welcome! For major changes, please open an issue first.
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the **ISC License**. -->
 
@@ -271,6 +271,6 @@ This project is licensed under the **ISC License**. -->
 
 <div align="center">
 
-Made with ❤️ by [Jyotika](https://github.com/Jyoti-24-05)
+Made by [Jyotika](https://github.com/Jyoti-24-05)
 
 </div>
